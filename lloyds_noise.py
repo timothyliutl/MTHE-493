@@ -5,7 +5,7 @@ import random
 
 R = 1         # Code Rate
 N = 2**R
-epsilon = 0.7 # Transition Probability (BSC)
+epsilon = 0.1 # Transition Probability (BSC)
 bsc = [[1-epsilon, epsilon], [epsilon, 1-epsilon]]
 
 mean, sd = 0, 1
@@ -40,27 +40,34 @@ def calcPartitions(samples, centroids):
     return partitions
 
 def calcCentroids(partitions):
-    centroids = [1] * N 
-    numerator = 0
-    denominator = 0
+    centroids = [0] * N 
     for j in range(0, N):
+        numerator = 0
+        denominator = 0
         for i in range(0, N):
-            numerator = numerator + bsc[i][j] * sum(partitions[i])/len(partitions[i])  
-            denominator = denominator + bsc[i][j] * len(partitions[i])/numSamples 
+            numerator = numerator + bsc[i][j] * sum(partitions[i])  
+            denominator = denominator + bsc[i][j] * len(partitions[i])
         centroids[j] = numerator/denominator
-
     return centroids
 
 def lloydAlgorithm(samples):
+    distortion = [] 
+    centroidMovement = [[] for i in range(0,N)]
+    centroids = [-0.5,1]
+    centroidMovement[0].append(centroids[0])
+    centroidMovement[1].append(centroids[1])
     for i in range(0,10):
-        partitions = calcPartitions(samples, [-1, 1])
+        partitions = calcPartitions(samples, centroids)
         centroids = calcCentroids(partitions)
-        distortion = calcDistortion(partitions, centroids)
-        #print(partitions)
+        centroidMovement[0].append(centroids[0])
+        centroidMovement[1].append(centroids[1])
+        distortion.append(calcDistortion(partitions, centroids))
         print(centroids)
-        print([min(partitions[0]), max(partitions[0])])
-        print([min(partitions[1]), max(partitions[1])])
-        #print(distortion)
+    plt.plot(distortion)
+    plt.plot(centroidMovement[0])
+    plt.plot(centroidMovement[1])
+    plt.show()
+    plt.savefig("distortion.png")
     return centroids, partitions
 
 samples = np.random.normal(mean, sd, numSamples)
