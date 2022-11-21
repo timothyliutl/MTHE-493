@@ -52,20 +52,47 @@ def calcCentroids(partitions):
 
 def lloydAlgorithm(samples):
     distortion = [] 
+    centroids = [-4, 1]
+    partitions = calcPartitions(samples, centroids)
+    distortion.append(calcDistortion(partitions, centroids))
+
+    print("Starting Centroids: {}".format(centroids))
+    print("Starting Distortion: {}".format(distortion[0]))
+
     centroidMovement = [[] for i in range(0,N)]
-    centroids = [-0.5,1]
-    centroidMovement[0].append(centroids[0])
-    centroidMovement[1].append(centroids[1])
-    for i in range(0,10):
+    for j in range(0,N):
+        centroidMovement[j].append(centroids[j])
+
+    i = 0
+    while True:
+        i = i + 1
         partitions = calcPartitions(samples, centroids)
         centroids = calcCentroids(partitions)
-        centroidMovement[0].append(centroids[0])
-        centroidMovement[1].append(centroids[1])
+        for j in range(0,N):
+            centroidMovement[j].append(centroids[j])
         distortion.append(calcDistortion(partitions, centroids))
-        print(centroids)
-    plt.plot(distortion)
-    plt.plot(centroidMovement[0])
-    plt.plot(centroidMovement[1])
+        if abs((distortion[i]-distortion[i-1])/distortion[i-1]) < 0.0001:
+            break
+
+    print("Iterations: %d" % i)
+    print("Final Centroids: {}".format(centroids))
+    print("Final Distortion: {}".format(distortion[-1]))
+
+    fig, ax1 = plt.subplots()
+    color = 'tab:red'
+    ax1.plot(distortion, label="Distortion", color=color)
+    ax1.set_xlabel("Iteration")
+    ax1.set_ylabel("Distortion", color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    ax2 = ax1.twinx()
+    color = 'tab:blue'
+    ax2.plot(centroidMovement[0], label="y0", color=color)
+    ax2.plot(centroidMovement[1], label="y1", color=color)
+    ax2.set_ylabel("Centroid Position", color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+    
+    fig.tight_layout()
     plt.show()
     plt.savefig("distortion.png")
     return centroids, partitions
