@@ -5,7 +5,7 @@ import random
 
 R = 1         # Code Rate
 N = 2**R
-epsilon = 0.1 # Transition Probability (BSC)
+epsilon = 0 # Transition Probability (BSC)
 bsc = [[1-epsilon, epsilon], [epsilon, 1-epsilon]]
 
 mean, sd = 0, 1
@@ -13,8 +13,8 @@ numSamples = 10**5
 
 def partitionDistortion(partition, centroid):
     distortion = 0
-    for i in range(0, N):
-        distortion = distortion + (partition[i] - centroid)**2
+    for sample in partition:
+        distortion = distortion + (sample - centroid)**2
     return distortion/len(partition)
 
 def calcDistortion(partitions, centroids):
@@ -95,8 +95,48 @@ def lloydAlgorithm(samples):
     fig.tight_layout()
     plt.show()
     plt.savefig("distortion.png")
-    return centroids, partitions
+    return [centroids, partitions]
+
+def encoder(partitions, message):
+    for i in range(0, N):
+        for sample in partitions[i]:
+            if message == sample:
+                return i
+    print("message not found")
+
+def decoder(centroids, codeword):
+    return centroids[codeword]
 
 samples = np.random.normal(mean, sd, numSamples)
 samples.sort()
-lloydAlgorithm(samples)
+[centroids, partitions] = lloydAlgorithm(samples)
+
+
+distortion = 0
+for msg in samples[0:1000]:
+    codeword = encoder(partitions, msg)
+    noise = np.random.binomial(n = 1, p = epsilon)
+    receivedCodeword = (codeword + noise) % N 
+    decodedMsg = decoder(centroids, receivedCodeword)
+    distortion = distortion + (decodedMsg-msg)**2
+
+distortion = distortion/1000
+print("Empirical Distortion: %f" % distortion)
+
+
+distortion = 0
+for msg in samples[0:1000]:
+    if(msg > 0):
+        codeword = 1
+    else:
+        codeword = 0
+    noise = np.random.binomial(n = 1, p = epsilon)
+    receivedCodeword = (codeword + noise) % N 
+    if(receivedCodeword > 0):
+        decodedMsg = math.sqrt(2/math.pi)
+    else:
+        decodeMsg = -1*math.sqrt(2/math.pi)
+    distortion = distortion + (decodedMsg-msg)**2
+
+distortion = distortion/1000
+print("Empirical Distortion of noiseless encoder: %f" % distortion)
