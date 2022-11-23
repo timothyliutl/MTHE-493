@@ -15,14 +15,14 @@ def partitionDistortion(partition, centroid):
     distortion = 0
     for sample in partition:
         distortion = distortion + (sample - centroid)**2
-    return distortion/len(partition)
+    return distortion
 
 def calcDistortion(partitions, centroids):
     distortion = 0
     for i in range(0, N):
         for j in range(0, N):
             distortion = distortion + bsc[i][j] * partitionDistortion(partitions[i], centroids[j])
-    return distortion
+    return distortion/numSamples
 
 def calcPartitions(samples, centroids):
     partitions = [[] for i in range(0, N)] 
