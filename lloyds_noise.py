@@ -5,8 +5,6 @@ import random
 
 R = 1         # Code Rate
 N = 2**R
-epsilon = 0 # Transition Probability (BSC)
-bsc = [[1-epsilon, epsilon], [epsilon, 1-epsilon]]
 
 mean, sd = 0, 1
 numSamples = 10**5
@@ -17,14 +15,14 @@ def partitionDistortion(partition, centroid):
         distortion = distortion + (sample - centroid)**2
     return distortion
 
-def calcDistortion(partitions, centroids):
+def calcDistortion(partitions, centroids, bsc):
     distortion = 0
     for i in range(0, N):
         for j in range(0, N):
             distortion = distortion + bsc[i][j] * partitionDistortion(partitions[i], centroids[j])
     return distortion/numSamples
 
-def calcPartitions(samples, centroids):
+def calcPartitions(samples, centroids, bsc):
     partitions = [[] for i in range(0, N)] 
     for sample in samples:
         distortion = -1 
@@ -39,7 +37,7 @@ def calcPartitions(samples, centroids):
         partitions[partition].append(sample)
     return partitions
 
-def calcCentroids(partitions):
+def calcCentroids(partitions, bsc):
     centroids = [0] * N 
     for j in range(0, N):
         numerator = 0
@@ -50,11 +48,11 @@ def calcCentroids(partitions):
         centroids[j] = numerator/denominator
     return centroids
 
-def lloydAlgorithm(samples):
+def lloydAlgorithm(samples, bsc):
     distortion = [] 
     centroids = [-4, 1]
-    partitions = calcPartitions(samples, centroids)
-    distortion.append(calcDistortion(partitions, centroids))
+    partitions = calcPartitions(samples, centroids, bsc)
+    distortion.append(calcDistortion(partitions, centroids, bsc))
 
     print("Starting Centroids: {}".format(centroids))
     print("Starting Distortion: {}".format(distortion[0]))
@@ -66,17 +64,17 @@ def lloydAlgorithm(samples):
     i = 0
     while True:
         i = i + 1
-        partitions = calcPartitions(samples, centroids)
-        centroids = calcCentroids(partitions)
+        partitions = calcPartitions(samples, centroids, bsc)
+        centroids = calcCentroids(partitions, bsc)
         for j in range(0,N):
             centroidMovement[j].append(centroids[j])
-        distortion.append(calcDistortion(partitions, centroids))
+        distortion.append(calcDistortion(partitions, centroids, bsc))
         if abs((distortion[i]-distortion[i-1])/distortion[i-1]) < 0.0001:
             break
 
     print("Iterations: %d" % i)
     print("Final Centroids: {}".format(centroids))
-    print("Final Distortion: {}".format(distortion[-1]))
+    print("Final Distortion: \033[92m%.4f\033[0m" % distortion[-1])
 
     fig, ax1 = plt.subplots()
     color = 'tab:red'
@@ -97,46 +95,54 @@ def lloydAlgorithm(samples):
     plt.savefig("distortion.png")
     return [centroids, partitions]
 
-def encoder(partitions, message):
-    for i in range(0, N):
-        for sample in partitions[i]:
-            if message == sample:
-                return i
-    print("message not found")
-
-def decoder(centroids, codeword):
-    return centroids[codeword]
-
+##
+# Testing actual encoder/decoder (prototype)
+#def encoder(partitions, message):
+#    for i in range(0, N):
+#        for sample in partitions[i]:
+#            if message == sample:
+#                return i
+#    print("message not found")
+#
+#def decoder(centroids, codeword):
+#    return centroids[codeword]
+#
 samples = np.random.normal(mean, sd, numSamples)
-samples.sort()
-[centroids, partitions] = lloydAlgorithm(samples)
+epsilon = 0.0 # Transition Probability (BSC)
+bsc = [[1-epsilon, epsilon], [epsilon, 1-epsilon]]
+print("Running Lloyds for Epsilon = %f" % epsilon)
+[centroids0, partitions0] = lloydAlgorithm(samples, bsc)
+epsilon = 0.1
+bsc = [[1-epsilon, epsilon], [epsilon, 1-epsilon]]
+print("\n\nRunning Lloyds for Epsilon = %f" % epsilon)
+[centroids1, partitions1] = lloydAlgorithm(samples, bsc)
+print("\n\nDistortion of noiseless encoder under noisy channel: \033[92m%.4f\033[0m" % calcDistortion(partitions0, centroids0, bsc))
 
-
-distortion = 0
-for msg in samples[0:1000]:
-    codeword = encoder(partitions, msg)
-    noise = np.random.binomial(n = 1, p = epsilon)
-    receivedCodeword = (codeword + noise) % N 
-    decodedMsg = decoder(centroids, receivedCodeword)
-    distortion = distortion + (decodedMsg-msg)**2
-
-distortion = distortion/1000
-print("Empirical Distortion: %f" % distortion)
-
-
-distortion = 0
-for msg in samples[0:1000]:
-    if(msg > 0):
-        codeword = 1
-    else:
-        codeword = 0
-    noise = np.random.binomial(n = 1, p = epsilon)
-    receivedCodeword = (codeword + noise) % N 
-    if(receivedCodeword > 0):
-        decodedMsg = math.sqrt(2/math.pi)
-    else:
-        decodeMsg = -1*math.sqrt(2/math.pi)
-    distortion = distortion + (decodedMsg-msg)**2
-
-distortion = distortion/1000
-print("Empirical Distortion of noiseless encoder: %f" % distortion)
+#distortion = 0
+#for msg in samples[0:1000]:
+#    codeword = encoder(partitions, msg)
+#    noise = np.random.binomial(n = 1, p = epsilon)
+#    receivedCodeword = (codeword + noise) % N 
+#    decodedMsg = decoder(centroids, receivedCodeword)
+#    distortion = distortion + (decodedMsg-msg)**2
+#
+#distortion = distortion/1000
+#print("Empirical Distortion: %f" % distortion)
+#
+#
+#distortion = 0
+#for msg in samples[0:1000]:
+#    if(msg > 0):
+#        codeword = 1
+#    else:
+#        codeword = 0
+#    noise = np.random.binomial(n = 1, p = epsilon)
+#    receivedCodeword = (codeword + noise) % N 
+#    if(receivedCodeword > 0):
+#        decodedMsg = math.sqrt(2/math.pi)
+#    else:
+#        decodeMsg = -1*math.sqrt(2/math.pi)
+#    distortion = distortion + (decodedMsg-msg)**2
+#
+#distortion = distortion/1000
+#print("Empirical Distortion of noiseless encoder: %f" % distortion)
