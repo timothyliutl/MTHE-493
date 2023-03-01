@@ -50,7 +50,6 @@ class CoSQ:
 
         def calc_partitions(points, centroids):
             partition_output = {centroid:[] for centroid in centroids}
-            print(partition_output)
             for index, point in enumerate(points):
                 closest_num = takeClosest(point, centroids)
                 # centroid the quantizer would quantize to without a noisy channel
@@ -76,14 +75,23 @@ class CoSQ:
                 weighted_average = 0
                 for i in range(len(centroids)):
                     trans_prob = calc_transition_prob(index, i)
-                    weighted_average = weighted_average + trans_prob*((np.array(partitions[centroid])).mean())
+                    if len(partitions[centroid])>0:
+                        weighted_average = weighted_average + trans_prob*((np.array(partitions[centroid])).mean())
                 new_centroids.append(weighted_average)
             return new_centroids
         
-        def iteration():
-            pass
+        def iteration(centroids, count):
+            old_centroids = centroids
+            partitions = calc_partitions(self.training_set, centroids)
+            new_centroids = calc_centroids(partitions, centroids)
+            while count < 15:
+                count = count + 1
+                return iteration(new_centroids, count)
+            self.centroids = new_centroids
+            return self.centroids
+
         #return calc_partitions(self.training_set, centroids)
-        return calc_centroids(calc_partitions(self.training_set, centroids), centroids)
+        return iteration(centroids, 0)
             
 
     def quantize(self, value):
