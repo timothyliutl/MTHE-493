@@ -60,12 +60,13 @@ class CoSQ:
 
     def fit(self):
 
-        if not self.training_set:
+        if len(self.training_set)==0:
             raise Exception("No training set has been imported you idiot sandwich")
 
         #train quantizer using lloyd max algorithm and memoryless channel
         num_centroids = 2**self.bits
-        centroids = [np.random.randint(0,255) for i in range(num_centroids)]
+        max_val = np.array(self.training_set).max()
+        centroids = [np.random.randint(0, max_val) for i in range(num_centroids)]
         partition_list = {}
         takeClosest = lambda num,collection:min(collection,key=lambda x:abs(x-num))
 
@@ -100,13 +101,13 @@ class CoSQ:
         def calc_partitions(points, centroids):
             partition_output = {centroid:[] for centroid in centroids}
             for index, point in enumerate(points):
-                closest_num = takeClosest(point, centroids)
+
                 # centroid the quantizer would quantize to without a noisy channel
                 # convert it to a number
                 # maybe we can reorganize it so the items with the highest distortion have the lowest probabilities
                 
                 #index/number the point is quantized to
-                index_centroid = centroids.index(closest_num)
+
                 #array that calculates all the mean square distances for each centroid
                 mse_array = []
                 for input_index in range(len(centroids)):
@@ -134,7 +135,7 @@ class CoSQ:
             old_centroids = centroids
             partitions = calc_partitions(self.training_set, centroids)
             new_centroids = calc_centroids(partitions, centroids)
-            while count < 15:
+            while count < 7:
                 count = count + 1
                 return iteration(new_centroids, count)
             self.centroids = new_centroids

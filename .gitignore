@@ -4,3 +4,4 @@ ganttchart1.pdf
 .DS_Store
 data/*
 thesis_julian.pdf
+quantizer_code/__pycache__
