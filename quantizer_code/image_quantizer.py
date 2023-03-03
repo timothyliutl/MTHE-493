@@ -121,11 +121,12 @@ class ImageQuantizer:
                 quantized_block = np.zeros(shape=(8,8))
                 for element in self.quantizer_array:
                     location = element[1]
-                    centroid_locations = element[0].cluster_centers_
+                    centroid_locations = element[0].centroids
                     pixel_val = block[location]
-                    centroid_num = element[0].quantize(pixel_val)
-                    quantized_block[location] = centroid_locations[centroid_num].copy()
+                    quantized_val = element[0].quantize(pixel_val)
+                    quantized_block[location] = quantized_val
                 quantized_output[i*8: (i+1)*8, j*8: (j+1)*8] = quantized_block
+        return quantized_output
 
     # tim
     # finish compress
