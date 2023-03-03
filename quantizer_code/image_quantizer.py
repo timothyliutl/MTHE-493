@@ -126,7 +126,7 @@ class ImageQuantizer:
                     quantized_val = element[0].quantize(pixel_val)
                     quantized_block[location] = quantized_val
                 quantized_output[i*8: (i+1)*8, j*8: (j+1)*8] = quantized_block
-        return quantized_output
+        return self.__reconstruct(quantized_output)
 
     # tim
     # finish compress
