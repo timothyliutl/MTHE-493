@@ -82,7 +82,7 @@ class ImageQuantizer:
     def import_training_set(self, image_path):
         self.training_set = []
         files = [f for f in os.listdir(image_path)]
-        files = files[:2]
+        files = files[:5]
         if '.DS_Store' in files:
             files.remove('.DS_Store')
         count = 0
@@ -129,7 +129,7 @@ class ImageQuantizer:
         return self.__reconstruct(quantized_output)
 
     # tim
-    # finish compress
+    # finish compress [done]
     # save centroid positions
 
     # mitch

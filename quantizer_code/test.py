@@ -19,7 +19,7 @@ bit_al_mat = np.matrix([[6,4,3,1,0,0,0,0],
                         [0,0,0,0,0,0,0,0],
                         ])
 
-obj2 = ImageQuantizer(bit_al_mat, 0.05)
+obj2 = ImageQuantizer(bit_al_mat, 0.005)
 obj2.import_training_set('../data/org/')
 image = cv2.imread('../data/org/1.pgm')
 obj2.train()
