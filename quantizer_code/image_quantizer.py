@@ -10,6 +10,7 @@ class ImageQuantizer:
         self.bit_allocation_matrix = bit_al_mat
         self.training_set = []
         self.epsilon = epsilon
+        self.trained = False
 
         self.quantizer_array = []
 
@@ -90,8 +91,10 @@ class ImageQuantizer:
             count = count + 1
             blocks = self.__blockify(self.__import_image(image_name, image_path))
             self.training_set = self.training_set + self.__generate_training(blocks)
+        print(len(self.training_set))
 
     def train(self):
+        self.trained = True
         count = 0
         for element in self.quantizer_array:
             print(count)
@@ -99,6 +102,41 @@ class ImageQuantizer:
             bit_location = element[1]
             element[0].training_set(np.array(self.training_set)[:,bit_location[0], bit_location[1]])
             element[0].fit()
-
+            
     def compress_image(self, image):
-        pass
+        if not self.trained:
+            raise Exception('uwu i made a fucky: shit aint trained')
+        
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image_dct_blocks = self.__blockify(image)
+        
+        return_block_array = []
+        length = int(image.shape[0]/8)
+        width = int(image.shape[1]/8)
+        quantized_output = np.zeros(shape=(length*8, width*8))
+
+        for i in range(length):
+            for j in range(width):
+                block = image_dct_blocks[i*8:(i+1)*8, j*8:(j+1)*8]
+                quantized_block = np.zeros(shape=(8,8))
+                for element in self.quantizer_array:
+                    location = element[1]
+                    centroid_locations = element[0].cluster_centers_
+                    pixel_val = block[location]
+                    centroid_num = element[0].quantize(pixel_val)
+                    quantized_block[location] = centroid_locations[centroid_num].copy()
+                quantized_output[i*8: (i+1)*8, j*8: (j+1)*8] = quantized_block
+
+    # tim
+    # finish compress
+    # save centroid positions
+
+    # mitch
+    # method to calculate distortion between compressed and original image
+    # trim all the images
+
+    # look into gaussian and laplacian distribution + latex
+    # if we have time: port over the quantizer training in C
+    # hardware + optimization 
+    # video encoding
+    

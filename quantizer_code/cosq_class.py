@@ -152,7 +152,7 @@ class CoSQ:
         for index, centroid in enumerate(self.centroids):
             mse_array.append(self.__calc_expected_distortion(self.centroids, index, value))
         mse_array = np.array(mse_array)
-        return np.argmin(mse_array)
+        return self.centroid_map[np.argmin(mse_array)]
         # quantize a given input value
 
 
