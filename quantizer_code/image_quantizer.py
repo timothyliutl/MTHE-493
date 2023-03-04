@@ -131,6 +131,7 @@ class ImageQuantizer:
     # tim
     # finish compress [done]
     # save centroid positions
+    # create c functions to optimize fit function on cosq_class
 
     # mitch
     # method to calculate distortion between compressed and original image
