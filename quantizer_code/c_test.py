@@ -40,10 +40,10 @@ my_functions.calc_centroids.restype = POINTER(c_int)
 #return_iter = my_functions.calc_centroids(arr1, len(arr1), centroids, cent_len, arr, len(arr), 0.005, 1, return_arr2)
 #print(np.fromiter(return_iter, dtype=np.float, count=len(centroids)))
 
+'''
 my_functions.iteration.argtypes = (POINTER(c_float), c_int, POINTER(c_float), c_int, c_int, c_float, c_int)
 my_functions.iteration.restype = POINTER(c_float)
-'''
 
 return_iter = my_functions.iteration(centroids, cent_len, arr, arr_len, 0, 0, 1)
 print(return_iter)
-#print(np.fromiter(return_iter, c_float, cent_len))
+print(np.fromiter(return_iter, c_float, cent_len))

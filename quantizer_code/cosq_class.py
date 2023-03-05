@@ -160,6 +160,10 @@ class CoSQ:
 
 
     def c_fit(self):
+        num_centroids = 2**self.bits
+        max_val = np.array(self.training_set).max()
+        self.centroids = [np.random.randint(0, max_val) for i in range(num_centroids)]
+
         my_functions.iteration.argtypes = (POINTER(c_float), c_int, POINTER(c_float), c_int, c_int, c_float, c_int)
         my_functions.iteration.restype = POINTER(c_float)
         c_centroid_array = (c_float * len(self.centroids))(*self.centroids)
@@ -167,6 +171,7 @@ class CoSQ:
         c_training_set = (c_float * len(self.training_set))(*self.training_set)
         c_training_len = len(self.training_set)
 
+        print(len(self.centroids), len(self.training_set))
         return_iter = my_functions.iteration(c_centroid_array, c_centroid_len, c_training_set, c_training_len, 0, self.epsilon, self.bits)
         print(np.fromiter(return_iter, c_float, c_centroid_len))
         self.centroids = np.fromiter(return_iter, c_float, c_centroid_len)

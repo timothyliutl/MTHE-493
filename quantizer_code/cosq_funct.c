@@ -93,7 +93,7 @@ int * calc_partitions(float point_array[], int point_length, float centroid_arra
 float * calc_centroids(int partition_arr[], int partition_arr_len, float centroid_arr[], int centroid_arr_len, float point_arr[], int point_arr_len, float epsilon, int bits, float* return_arr){
     float sum_array[centroid_arr_len];
     int sum_array_count[centroid_arr_len];
-    printf("---------\n");
+    //printf("---------\n");
 
     if(partition_arr_len!=point_arr_len){
         printf("uwu i made a fucky");
@@ -133,9 +133,9 @@ float * iteration(float centroids[], int centroid_len, float training_points[], 
     int point2centroid[training_point_len];
     calc_partitions(training_points, training_point_len, centroids, centroid_len, epsilon, bits, point2centroid);
     calc_centroids(point2centroid, training_point_len, centroids, centroid_len, training_points, training_point_len, epsilon, bits, centroids);
-    printf("--------\n");
+    //printf("--------\n");
     for(int i =0; i<centroid_len; i++){
-        printf("%f\n", centroids[i]);
+        //printf("%f\n", centroids[i]);
     }
 
     
