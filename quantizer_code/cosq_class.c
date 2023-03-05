@@ -56,11 +56,12 @@ float calc_transition_probabilities(int input, int output, float epsilon, int bi
 
 float expected_distortion(float centroid_array[], int array_length, int index, float point, float epsilon, int bits){
     float distortion = 0;
-    
+
     for(int i =0; i<array_length; i++){
         float trans_prob = calc_transition_probabilities(index, i, epsilon, bits);
         distortion+= trans_prob * powf(centroid_array[i] - point, 2);
     }
+    
     return distortion;
 }
 
@@ -74,10 +75,10 @@ int * calc_partitions(float point_array[], int point_length, float centroid_arra
         float global_min;
         for(int j=0; j<centroid_length; j++){
             if(j==0){
-                global_min = expected_distortion(centroid_array, centroid_length, i, point_array[j], epsilon, bits);
+                global_min = expected_distortion(centroid_array, centroid_length, j, point_array[i], epsilon, bits);
                 continue;
             }
-            float current_exp_dist = expected_distortion(centroid_array, centroid_length, i, point_array[j], epsilon, bits);
+            float current_exp_dist = expected_distortion(centroid_array, centroid_length, j, point_array[i], epsilon, bits);
             if (current_exp_dist<global_min){
                 global_min = current_exp_dist;
                 index_min_dis = j;
@@ -113,18 +114,33 @@ float * calc_centroids(int partition_arr[], int partition_arr_len, float centroi
         float new_centroid_val = 0;
         for(int j=0; j<centroid_arr_len; j++){
             float trans_prob = calc_transition_probabilities(i,j, epsilon, bits);
-            float average;
             if(sum_array_count[j]>0){
-                average = sum_array[j]/(float)(sum_array_count[j]);
+                float average = sum_array[j]/(float)(sum_array_count[j]);
                 //printf("%f\n", sum_array[j]);
                 new_centroid_val += (trans_prob*average);
+                printf("%f,     %f \n", average, trans_prob);
             }
-            printf("%f,     %f \n", average, trans_prob);
             
         }
-        //printf("%f\n", new_centroid_val);
+        printf("%f\n", new_centroid_val);
         return_arr[i] = new_centroid_val;
     }
     return return_arr;
+}
+
+float * iteration(float centroids[], int centroid_len, float training_points[], int training_point_len, int count, float epsilon, int bits){
+    printf("%i", count);
+    int point2centroid[training_point_len];
+    calc_partitions(training_points, training_point_len, centroids, centroid_len, epsilon, bits, point2centroid);
+    calc_centroids(point2centroid, training_point_len, centroids, centroid_len, training_points, training_point_len, epsilon, bits, centroids);
+    while(count<100){
+        return iteration(centroids, centroid_len, training_points, training_point_len, count+1, epsilon, bits);
+    }
+
+    for(int i =0; i<centroid_len; i++){
+        printf("%f\n", centroids[i]);
+    }
+
+    return centroids;
 }
 
