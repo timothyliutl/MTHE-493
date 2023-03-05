@@ -1,4 +1,7 @@
 import numpy as np
+from ctypes import *
+my_functions = CDLL('cosq_funct.so')
+
 
 class CoSQ:
     def __init__(self, epsilon, bits):
@@ -156,3 +159,15 @@ class CoSQ:
         # quantize a given input value
 
 
+    def c_fit(self):
+        my_functions.iteration.argtypes = (POINTER(c_float), c_int, POINTER(c_float), c_int, c_int, c_float, c_int)
+        my_functions.iteration.restype = POINTER(c_float)
+        c_centroid_array = (c_float * len(self.centroids))(*self.centroids)
+        c_centroid_len = len(self.centroids)
+        c_training_set = (c_float * len(self.training_set))(*self.training_set)
+        c_training_len = len(self.training_set)
+
+        return_iter = my_functions.iteration(c_centroid_array, c_centroid_len, c_training_set, c_training_len, 0, self.epsilon, self.bits)
+        print(np.fromiter(return_iter, c_float, c_centroid_len))
+        self.centroids = np.fromiter(return_iter, c_float, c_centroid_len)
+        self.centroid_map = {index:centroid_val for index, centroid_val in enumerate(self.centroids)}

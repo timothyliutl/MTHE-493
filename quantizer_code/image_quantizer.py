@@ -101,7 +101,7 @@ class ImageQuantizer:
             count = count + 1
             bit_location = element[1]
             element[0].training_set(np.array(self.training_set)[:,bit_location[0], bit_location[1]])
-            element[0].fit()
+            element[0].c_fit()
             
     def compress_image(self, image):
         if not self.trained:

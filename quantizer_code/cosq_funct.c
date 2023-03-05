@@ -118,29 +118,31 @@ float * calc_centroids(int partition_arr[], int partition_arr_len, float centroi
                 float average = sum_array[j]/(float)(sum_array_count[j]);
                 //printf("%f\n", sum_array[j]);
                 new_centroid_val += (trans_prob*average);
-                printf("%f,     %f \n", average, trans_prob);
+                //printf("%f,     %f \n", average, trans_prob);
             }
             
         }
-        printf("%f\n", new_centroid_val);
+        //printf("%f\n", new_centroid_val);
         return_arr[i] = new_centroid_val;
     }
     return return_arr;
 }
 
 float * iteration(float centroids[], int centroid_len, float training_points[], int training_point_len, int count, float epsilon, int bits){
-    printf("%i", count);
+    //printf("%i", count);
     int point2centroid[training_point_len];
     calc_partitions(training_points, training_point_len, centroids, centroid_len, epsilon, bits, point2centroid);
     calc_centroids(point2centroid, training_point_len, centroids, centroid_len, training_points, training_point_len, epsilon, bits, centroids);
-    while(count<100){
-        return iteration(centroids, centroid_len, training_points, training_point_len, count+1, epsilon, bits);
-    }
-
+    printf("--------\n");
     for(int i =0; i<centroid_len; i++){
         printf("%f\n", centroids[i]);
     }
 
+    
+    while(count<20){
+        return iteration(centroids, centroid_len, training_points, training_point_len, count+1, epsilon, bits);
+    }
+        
     return centroids;
 }
 
