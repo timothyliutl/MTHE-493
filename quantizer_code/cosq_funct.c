@@ -55,7 +55,7 @@ float calc_transition_probabilities(int input, int output, float epsilon, int bi
 }
 
 float expected_distortion(float centroid_array[], int array_length, int index, float point, float epsilon, int bits){
-    float distortion = 0;
+    double distortion = 0;
 
     for(int i =0; i<array_length; i++){
         float trans_prob = calc_transition_probabilities(index, i, epsilon, bits);
@@ -72,7 +72,7 @@ int * calc_partitions(float point_array[], int point_length, float centroid_arra
 
     for(int i=0; i<point_length; i++){
         int index_min_dis = 0;
-        float global_min;
+        double global_min;
         for(int j=0; j<centroid_length; j++){
             if(j==0){
                 global_min = expected_distortion(centroid_array, centroid_length, j, point_array[i], epsilon, bits);
@@ -91,7 +91,7 @@ int * calc_partitions(float point_array[], int point_length, float centroid_arra
 }
 
 float * calc_centroids(int partition_arr[], int partition_arr_len, float centroid_arr[], int centroid_arr_len, float point_arr[], int point_arr_len, float epsilon, int bits, float* return_arr){
-    float sum_array[centroid_arr_len];
+    double sum_array[centroid_arr_len];
     int sum_array_count[centroid_arr_len];
     //printf("---------\n");
 
@@ -111,7 +111,7 @@ float * calc_centroids(int partition_arr[], int partition_arr_len, float centroi
     }
 
     for(int i=0; i<centroid_arr_len; i++){
-        float new_centroid_val = 0;
+        double new_centroid_val = 0;
         for(int j=0; j<centroid_arr_len; j++){
             float trans_prob = calc_transition_probabilities(i,j, epsilon, bits);
             if(sum_array_count[j]>0){
@@ -119,6 +119,8 @@ float * calc_centroids(int partition_arr[], int partition_arr_len, float centroi
                 //printf("%f\n", sum_array[j]);
                 new_centroid_val += (trans_prob*average);
                 //printf("%f,     %f \n", average, trans_prob);
+            }else{
+                new_centroid_val = centroid_arr[i];
             }
             
         }
