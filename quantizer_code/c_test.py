@@ -8,21 +8,30 @@ cent_len = len(centroids)
 centroids = (c_float * len(centroids))(*centroids)
 
 arr = [np.random.rand()*10 for i in range(100)]
-print(arr)
+#print(arr)
 arr_len = len(arr)
 arr = (c_float * len(arr))(*arr)
 
 
 
+nbits=6
+int_pointer = (c_char * nbits)()
+my_functions.int2bin.argtypes = (c_uint, POINTER(c_char), c_int)
+my_functions.int2bin(1,int_pointer, nbits)
+print(np.fromiter(int_pointer, c_char, nbits))
 
 #assert that the array len integer matches the length of the array
 my_functions.calc_transition_probabilities.argtypes = (c_int, c_int, c_float, c_int)
 my_functions.calc_transition_probabilities.restype = c_float
 
+print('trans probability',my_functions.calc_transition_probabilities(2,2,0.05,1))
+
 my_functions.expected_distortion.argtypes = (POINTER(c_float), c_int, c_float, c_int, c_float, c_int)
 my_functions.expected_distortion.restype = c_float
 
 print('expected distortion',my_functions.expected_distortion(centroids, cent_len, 0, 0, 0, 1))
+
+
 
 '''
 my_functions.calc_partitions.argtypes = (POINTER(c_float), c_int, POINTER(c_float), c_int, c_float, c_int, POINTER(c_int))

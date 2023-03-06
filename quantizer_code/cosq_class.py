@@ -138,7 +138,7 @@ class CoSQ:
             old_centroids = centroids
             partitions = calc_partitions(self.training_set, centroids)
             new_centroids = calc_centroids(partitions, centroids)
-            while count < 7:
+            while count < 15:
                 count = count + 1
                 return iteration(new_centroids, count)
             self.centroids = new_centroids

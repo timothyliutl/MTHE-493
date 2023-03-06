@@ -10,7 +10,7 @@ return ;
 
 /*
 run this command each time this file is changed
-cc -fPIC -shared -o cosq_class.so cosq_class.c 
+cc -fPIC -shared -o cosq_funct.so cosq_funct.c 
 
 */
 
@@ -139,7 +139,7 @@ float * iteration(float centroids[], int centroid_len, float training_points[], 
     }
 
     
-    while(count<20){
+    while(count<10){
         return iteration(centroids, centroid_len, training_points, training_point_len, count+1, epsilon, bits);
     }
         

@@ -82,7 +82,7 @@ class ImageQuantizer:
     def import_training_set(self, image_path):
         self.training_set = []
         files = [f for f in os.listdir(image_path)]
-        files = files[:5]
+        files = files[:20]
         if '.DS_Store' in files:
             files.remove('.DS_Store')
         count = 0
