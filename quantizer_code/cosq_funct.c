@@ -71,10 +71,11 @@ int * calc_partitions(float point_array[], int point_length, float centroid_arra
     //array that has corresponding to point array, contains centroid index value for the point
 
     for(int i=0; i<point_length; i++){
-        int index_min_dis = 0;
+        int index_min_dis;
         double global_min;
         for(int j=0; j<centroid_length; j++){
             if(j==0){
+                index_min_dis = 0;
                 global_min = expected_distortion(centroid_array, centroid_length, j, point_array[i], epsilon, bits);
                 continue;
             }
@@ -141,7 +142,7 @@ float * iteration(float centroids[], int centroid_len, float training_points[], 
     }
 
     
-    while(count<10){
+    while(count<15){
         return iteration(centroids, centroid_len, training_points, training_point_len, count+1, epsilon, bits);
     }
         
