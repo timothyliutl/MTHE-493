@@ -71,11 +71,10 @@ int * calc_partitions(float point_array[], int point_length, float centroid_arra
     //array that has corresponding to point array, contains centroid index value for the point
 
     for(int i=0; i<point_length; i++){
-        int index_min_dis;
         double global_min;
+        int index_min_dis = 0;
         for(int j=0; j<centroid_length; j++){
             if(j==0){
-                index_min_dis = 0;
                 global_min = expected_distortion(centroid_array, centroid_length, j, point_array[i], epsilon, bits);
                 continue;
             }
@@ -121,7 +120,7 @@ float * calc_centroids(int partition_arr[], int partition_arr_len, float centroi
                 new_centroid_val += (trans_prob*average);
                 //printf("%f,     %f \n", average, trans_prob);
             }else{
-                new_centroid_val = centroid_arr[i];
+                new_centroid_val += (trans_prob* centroid_arr[j]);
             }
             
         }
