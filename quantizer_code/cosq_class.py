@@ -1,6 +1,6 @@
 import numpy as np
 from ctypes import *
-my_functions = CDLL('cosq_funct.so')
+my_functions = CDLL('./cosq_funct.so')
 
 
 class CoSQ:
@@ -155,8 +155,14 @@ class CoSQ:
         for index, centroid in enumerate(self.centroids):
             mse_array.append(self.__calc_expected_distortion(self.centroids, index, value))
         mse_array = np.array(mse_array)
-        return self.centroid_map[np.argmin(mse_array)]
+        #return self.centroid_map[np.argmin(mse_array)]
+        return np.argmin(mse_array)
         # quantize a given input value
+
+    # Set centroids from previously saved model
+    def set_centroids(self, centroids):
+        self.centroids = centroids
+        self.centroid_map = {index:centroid_val for index, centroid_val in enumerate(self.centroids)}
 
 
     def c_fit(self):
