@@ -68,13 +68,20 @@ class ImageQuantizer:
                 return_arr.append(dct_block[i*8:(i+1)*8, j*8:(j+1)*8])
         return return_arr
     
-    def __reconstruct(self, quantized_block):
+    def __unquantize_block(self, block):
+        for element in self.quantizer_array:
+            location = element[1]
+            block[location] = element[0].centroid_map[block[location]]
+        return block
+
+    def reconstruct_image(self, quantized_block):
         len_rounded = int(quantized_block.shape[0]/8)
         width_rounded = int(quantized_block.shape[1]/8)
         recon_image = np.zeros(shape=(len_rounded*8, width_rounded*8))
         for i in range(len_rounded):
             for j in range(width_rounded):
-                recon_image[8*i:8*(i+1), 8*j:8*(j+1)] = self.__idct_funct(quantized_block[8*i:8*(i+1), 8*j:8*(j+1)])
+                centroid_block = self.__unquantize_block(quantized_block[8*i:8*(i+1), 8*j:8*(j+1)])
+                recon_image[8*i:8*(i+1), 8*j:8*(j+1)] = self.__idct_funct(centroid_block)
         return recon_image
 
     # functions used for compressing an image set
@@ -102,6 +109,70 @@ class ImageQuantizer:
             bit_location = element[1]
             element[0].training_set(np.array(self.training_set)[:,bit_location[0], bit_location[1]])
             element[0].c_fit()
+
+    def save_model(self, file_path, comments):
+        # Save model (bit allocation matrix, centroids etc.) to flat .txt file
+        # comments is a set of strings starting with '#' and ending in '\n' (newline) 
+        #if not self.trained:
+        #    raise Exception('Model not trained')
+
+        f = open(file_path, "w")
+
+        # Add comments to file
+        if comments != None:
+            for comment in comments:
+                f.write("{}\n".format(comment))
+        
+        # Write bit allocation matrix to file
+        # Dimensions
+        f.write("({},{})\n".format(self.bit_allocation_matrix.shape[0], self.bit_allocation_matrix.shape[1]))
+        for i in range(self.bit_allocation_matrix.shape[0]):
+            for j in range(self.bit_allocation_matrix.shape[1]):
+                f.write("{} ".format(self.bit_allocation_matrix[i,j]))
+            f.write("\n")
+            
+        # Write centroid positions
+        for element in self.quantizer_array:
+            f.write("{}\n".format(element[1]))
+            f.write("[")
+            for centroid in element[0].centroids:
+                f.write("{} ".format(centroid))
+            f.write("]\n")
+
+        f.close()
+        
+
+    # Load model from file
+    def load_model(self, file_path):
+        f = open(file_path, "r")
+        line = f.readline()
+        # skip through comments
+        while line[0] == '#':
+            line = f.readline()
+
+        # Get bit allocation matrix 
+        dimension = [int(x) for x in line.strip('[()]\n').split(',')]
+        bit_al_mat = np.zeros([dimension[0], dimension[1]], dtype=int) 
+        for i in range(dimension[0]):
+            row = [int(x) for x in f.readline().strip('[()]\n ').split(' ')]
+            bit_al_mat[i] = np.array(row)
+        print(bit_al_mat)
+        self.bit_allocation_matrix = bit_al_mat
+
+        # Get centroids
+        while True:
+            line = f.readline()
+            # EOF
+            if len(line) == 0:
+                break
+            location = tuple(int(x) for x in line.strip('[()]\n ').split(','))
+            centroids = [float(x) for x in f.readline().strip('[()]\n ').split()] 
+            for element in self.quantizer_array:
+                if element[1] == location:
+                    element[0].set_centroids(centroids) 
+                    break
+        self.trained = True
+
             
     def compress_image(self, image):
         if not self.trained:
@@ -113,7 +184,7 @@ class ImageQuantizer:
         return_block_array = []
         length = int(image.shape[0]/8)
         width = int(image.shape[1]/8)
-        quantized_output = np.zeros(shape=(length*8, width*8))
+        quantized_output = np.zeros(shape=(length*8, width*8), dtype=int)
 
         for i in range(length):
             for j in range(width):
@@ -126,12 +197,34 @@ class ImageQuantizer:
                     quantized_val = element[0].quantize(pixel_val)
                     quantized_block[location] = quantized_val
                 quantized_output[i*8: (i+1)*8, j*8: (j+1)*8] = quantized_block
-        return self.__reconstruct(quantized_output)
+        #return self.reconstruct_image(quantized_output)
+        return quantized_output
 
     # tim
     # finish compress [done]
     # save centroid positions
     # create c functions to optimize fit function on cosq_class
+
+    def __path_to_matrix(self, image_path):
+        image = cv2.cvtColor(cv2.imread(image_path + file), cv2.COLOR_BGR2GRAY)
+        height = int(image.shape[0]/8)
+        width = int(image.shape[1]/8)
+        trimmed_image = image[0:height_rounded*8, 0:width_rounded*8]
+        return trimmed_image
+        
+    def calc_distortion(self, sent_image_path, received_image_path):
+        sent_image = self.__path_to_matrix(send_image_path) 
+        received_image = self.__path_to_matrix(received_image_path) 
+        if sent_image.shape[0] != received_image.shape[0] or sent_image.shape[1] != received_image.shape[1]:
+            raise Exception('Images have mismatched size')
+        distortion = 0
+        for i in range(sent_image.shape[0]):
+            for j in range(sent_image.shape[1]):
+                distortion = distortion + (send_image[i][j] - received_image[i][j])**2
+        return distortion/(sent_image.shape[0] * sent_image.shape[1])
+
+
+
 
     # mitch
     # method to calculate distortion between compressed and original image
