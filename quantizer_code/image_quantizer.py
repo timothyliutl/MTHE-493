@@ -206,21 +206,21 @@ class ImageQuantizer:
     # create c functions to optimize fit function on cosq_class
 
     def __path_to_matrix(self, image_path):
-        image = cv2.cvtColor(cv2.imread(image_path + file), cv2.COLOR_BGR2GRAY)
-        height = int(image.shape[0]/8)
-        width = int(image.shape[1]/8)
+        image = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2GRAY)
+        height_rounded = int(image.shape[0]/8)
+        width_rounded = int(image.shape[1]/8)
         trimmed_image = image[0:height_rounded*8, 0:width_rounded*8]
         return trimmed_image
         
     def calc_distortion(self, sent_image_path, received_image_path):
-        sent_image = self.__path_to_matrix(send_image_path) 
+        sent_image = self.__path_to_matrix(sent_image_path) 
         received_image = self.__path_to_matrix(received_image_path) 
         if sent_image.shape[0] != received_image.shape[0] or sent_image.shape[1] != received_image.shape[1]:
             raise Exception('Images have mismatched size')
         distortion = 0
         for i in range(sent_image.shape[0]):
             for j in range(sent_image.shape[1]):
-                distortion = distortion + (send_image[i][j] - received_image[i][j])**2
+                distortion = distortion + (sent_image[i][j] - received_image[i][j])**2
         return distortion/(sent_image.shape[0] * sent_image.shape[1])
 
 
