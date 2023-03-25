@@ -1,6 +1,6 @@
 import numpy as np
 from ctypes import *
-my_functions = CDLL('./cosq_funct.so')
+my_functions = CDLL('cosq_funct.so')
 
 
 class CoSQ:

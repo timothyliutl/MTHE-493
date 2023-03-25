@@ -5,3 +5,4 @@ ganttchart1.pdf
 data/*
 thesis_julian.pdf
 quantizer_code/__pycache__
+quantizer_code/cosq_funct.so

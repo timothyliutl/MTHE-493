@@ -11,6 +11,7 @@ class ImageQuantizer:
         self.training_set = []
         self.epsilon = epsilon
         self.trained = False
+        self.gaussian = False
 
         self.quantizer_array = []
 
@@ -20,7 +21,10 @@ class ImageQuantizer:
                     self.quantizer_array.append([CoSQ(epsilon=self.epsilon, bits=bit_al_mat[i,j]), (i,j)])
 
     #hidden helper functions
+        
+
     def __import_image(self, file_path, image_file_path):
+        print(image_file_path + file_path)
         im = cv2.imread(image_file_path + file_path)
         return cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
     
@@ -89,7 +93,7 @@ class ImageQuantizer:
     def import_training_set(self, image_path):
         self.training_set = []
         files = [f for f in os.listdir(image_path)]
-        files = files[:20]
+        #files = files[:20]
         if '.DS_Store' in files:
             files.remove('.DS_Store')
         count = 0
@@ -109,6 +113,18 @@ class ImageQuantizer:
             bit_location = element[1]
             element[0].training_set(np.array(self.training_set)[:,bit_location[0], bit_location[1]])
             element[0].c_fit()
+    
+    def gaussian_train(self, mean, var):
+        self.trained = True
+        count = 0
+        for element in self.quantizer_array:
+            print(count)
+            count = count + 1
+            bit_location = element[1]
+            
+            element[0].training_set(np.array(np.random.normal(0, 1,5000)))
+            element[0].c_fit()
+
 
     def save_model(self, file_path, comments):
         # Save model (bit allocation matrix, centroids etc.) to flat .txt file
@@ -203,7 +219,7 @@ class ImageQuantizer:
     # tim
     # finish compress [done]
     # save centroid positions
-    # create c functions to optimize fit function on cosq_class
+    # create c functions to optimize fit function on cosq_class [done]
 
     def __path_to_matrix(self, image_path):
         image = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2GRAY)
