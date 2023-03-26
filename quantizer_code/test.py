@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 #obj.fit()
 
 
-bit_al_mat = np.matrix([[7,5,3,1,0,0,0,0],
+bit_al_mat = np.matrix([[6,5,3,1,0,0,0,0],
                         [3,2,2,0,0,0,0,0],
                         [1,1,1,0,0,0,0,0],
                         [0,0,0,0,0,0,0,0],
@@ -33,7 +33,7 @@ obj2 = ImageQuantizer(bit_al_mat, epsilon)
 obj2.import_training_set('../data/org2/')
 image = cv2.imread('../data/org2/16.pgm')
 obj2.train()
-obj2.save_model('./model_0', ["#Epsilon = {}".format(epsilon)])
+obj2.save_model('./model_01', ["#Epsilon = {}".format(epsilon)])
 #obj2.load_model('./model_01')
 #obj2.quantizer_array[0][0].set_centroids([1,2])
 

@@ -177,18 +177,26 @@ class CoSQ:
         num_centroids = 2**self.bits
         max_val = np.array(self.training_set).max()
         self.centroids = [np.random.randint(0, max_val) for i in range(num_centroids)]
-
-        #grab 10000 random training samples
-
+        len_training_set = len(self.training_set)
+        print(len(self.centroids), len(self.training_set))
         my_functions.iteration.argtypes = (POINTER(c_float), c_int, POINTER(c_float), c_int, c_int, c_float, c_int)
         my_functions.iteration.restype = POINTER(c_float)
-        c_centroid_array = (c_float * len(self.centroids))(*self.centroids)
-        c_centroid_len = len(self.centroids)
-        c_training_set = (c_float * len(self.training_set))(*self.training_set)
-        c_training_len = len(self.training_set)
 
-        print(len(self.centroids), len(self.training_set))
-        return_iter = my_functions.iteration(c_centroid_array, c_centroid_len, c_training_set, c_training_len, 0, self.epsilon, self.bits)
+        #grab 10000 random training samples and loop mini batch gradient descent
+        for i in range(15 * int(len_training_set/5000)):
+            print('iteration ', i)
+            if len(self.training_set)>5000:
+                subset = np.random.choice(self.training_set, 5000)
+            else:
+                subset = self.training_set
+
+
+            c_centroid_array = (c_float * len(self.centroids))(*self.centroids)
+            c_centroid_len = len(self.centroids)
+            c_training_set = (c_float * len(subset))(*subset)
+            c_training_len = len(subset)
+            return_iter = my_functions.iteration(c_centroid_array, c_centroid_len, c_training_set, c_training_len, 0, self.epsilon, self.bits)
+            self.centroids = np.fromiter(return_iter, c_float, c_centroid_len)
+            self.centroid_map = {index:centroid_val for index, centroid_val in enumerate(self.centroids)}
+
         print(np.fromiter(return_iter, c_float, c_centroid_len))
-        self.centroids = np.fromiter(return_iter, c_float, c_centroid_len)
-        self.centroid_map = {index:centroid_val for index, centroid_val in enumerate(self.centroids)}
