@@ -140,13 +140,14 @@ float * iteration(float centroids[], int centroid_len, float training_points[], 
         //printf("%f\n", centroids[i]);
     }
 
-    
+    /*
     while(count<15){
         return iteration(centroids, centroid_len, training_points, training_point_len, count+1, epsilon, bits);
     }
+    */
+
+   // applying mini batch gradient decent in python code
         
     return centroids;
 }
-
-//TODO: recreate the quantization code in C
 

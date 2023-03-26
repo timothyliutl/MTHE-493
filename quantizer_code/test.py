@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 #obj.fit()
 
 
-bit_al_mat = np.matrix([[6,4,3,1,0,0,0,0],
+bit_al_mat = np.matrix([[7,5,3,1,0,0,0,0],
                         [3,2,2,0,0,0,0,0],
                         [1,1,1,0,0,0,0,0],
                         [0,0,0,0,0,0,0,0],
@@ -30,13 +30,18 @@ bit_al_mat = np.matrix([[6,4,3,1,0,0,0,0],
 
 epsilon = 0.01
 obj2 = ImageQuantizer(bit_al_mat, epsilon)
-obj2.import_training_set('../data/org/')
-image = cv2.imread('../data/org/1.pgm')
+obj2.import_training_set('../data/org2/')
+image = cv2.imread('../data/org2/16.pgm')
 obj2.train()
-obj2.save_model('./model_01', ["#Epsilon = {}".format(epsilon)])
-#obj2.load_model('./model')
+obj2.save_model('./model_0', ["#Epsilon = {}".format(epsilon)])
+#obj2.load_model('./model_01')
+#obj2.quantizer_array[0][0].set_centroids([1,2])
+
+
+print(obj2.quantizer_array)
 compressed_img = obj2.compress_image(image)
-channel = Channel(epsilon, bit_al_mat)
+print(compressed_img)
+channel = Channel(0.01, bit_al_mat)
 received_img = channel.send_image(compressed_img)
 uncompressed_img = obj2.reconstruct_image(received_img)
 plot = plt.imsave('uncompressed_image_01.png',uncompressed_img, cmap='gray')

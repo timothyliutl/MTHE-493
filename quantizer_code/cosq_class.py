@@ -178,6 +178,8 @@ class CoSQ:
         max_val = np.array(self.training_set).max()
         self.centroids = [np.random.randint(0, max_val) for i in range(num_centroids)]
 
+        #grab 10000 random training samples
+
         my_functions.iteration.argtypes = (POINTER(c_float), c_int, POINTER(c_float), c_int, c_int, c_float, c_int)
         my_functions.iteration.restype = POINTER(c_float)
         c_centroid_array = (c_float * len(self.centroids))(*self.centroids)

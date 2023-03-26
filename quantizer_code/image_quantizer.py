@@ -193,9 +193,8 @@ class ImageQuantizer:
             location = tuple(int(x) for x in line.strip('[()]\n ').split(','))
             centroids = [float(x) for x in f.readline().strip('[()]\n ').split()] 
             for element in self.quantizer_array:
-                if element[1] == location:
+                if element[1] == location and len(centroids)!=0:
                     element[0].set_centroids(centroids) 
-                    break
         self.trained = True
 
             
