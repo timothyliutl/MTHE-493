@@ -35,10 +35,18 @@ class CoSQ:
                 return prob
     
     def __calc_expected_distortion(self, centroids, index, point):
-            distortion = 0
-            for i in range(len(centroids)):
-                trans_prob = self.__calc_transition_prob(index, i)
-                distortion = distortion + trans_prob*((centroids[i] - point)**2)
+            my_functions.expected_distortion.argtypes = (POINTER(c_float), c_int, c_int, c_float, c_float, c_int)
+            my_functions.expected_distortion.restype = c_float
+
+            c_centroid_array = (c_float * len(self.centroids))(*self.centroids)
+            c_centroid_len = len(self.centroids)
+            int_index = int(index)
+
+            distortion = my_functions.expected_distortion(c_centroid_array, c_centroid_len, int_index, point, self.epsilon, self.bits)
+            #using function made in C instead of this
+            #for i in range(len(centroids)):
+                #trans_prob = self.__calc_transition_prob(index, i)
+                #distortion = distortion + trans_prob*((centroids[i] - point)**2)
             return distortion
     
     def __calc_partitions(self, points, centroids):

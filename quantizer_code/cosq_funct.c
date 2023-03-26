@@ -148,3 +148,5 @@ float * iteration(float centroids[], int centroid_len, float training_points[], 
     return centroids;
 }
 
+//TODO: recreate the quantization code in C
+

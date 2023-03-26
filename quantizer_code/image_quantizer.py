@@ -12,6 +12,8 @@ class ImageQuantizer:
         self.epsilon = epsilon
         self.trained = False
         self.gaussian = False
+        self.mean_mat = np.matrix(np.zeros(shape=(8,8)))
+        self.std_mat = np.matrix(np.zeros(shape=(8,8)))
 
         self.quantizer_array = []
 
@@ -77,6 +79,7 @@ class ImageQuantizer:
             location = element[1]
             block[location] = element[0].centroid_map[block[location]]
         return block
+    
 
     def reconstruct_image(self, quantized_block):
         len_rounded = int(quantized_block.shape[0]/8)
@@ -114,7 +117,13 @@ class ImageQuantizer:
             element[0].training_set(np.array(self.training_set)[:,bit_location[0], bit_location[1]])
             element[0].c_fit()
     
-    def gaussian_train(self, mean, var):
+    def gaussian_train(self):
+
+        for i in range(8):
+            for j in range(8):
+                self.mean_mat[i,j] = np.mean(np.array(self.training_set)[:,i,j])
+                self.std_mat[i,j] = np.std(np.array(self.training_set)[:,i,j])
+
         self.trained = True
         count = 0
         for element in self.quantizer_array:
@@ -122,7 +131,7 @@ class ImageQuantizer:
             count = count + 1
             bit_location = element[1]
             
-            element[0].training_set(np.array(np.random.normal(0, 1,5000)))
+            element[0].training_set(np.array(np.random.normal(self.mean_mat[bit_location], self.std_mat[bit_location],5000)))
             element[0].c_fit()
 
 
@@ -201,9 +210,12 @@ class ImageQuantizer:
         length = int(image.shape[0]/8)
         width = int(image.shape[1]/8)
         quantized_output = np.zeros(shape=(length*8, width*8), dtype=int)
+        count = 0
 
         for i in range(length):
             for j in range(width):
+                count = count + 1
+                print('compressing block ',count, ' out of ', length*width )
                 block = image_dct_blocks[i*8:(i+1)*8, j*8:(j+1)*8]
                 quantized_block = np.zeros(shape=(8,8))
                 for element in self.quantizer_array:

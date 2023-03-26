@@ -2,7 +2,7 @@ ganttchart.xltx
 ganttchart1.xlsx
 ganttchart1.pdf
 .DS_Store
-data/*
+
 thesis_julian.pdf
 quantizer_code/__pycache__
 quantizer_code/cosq_funct.so
