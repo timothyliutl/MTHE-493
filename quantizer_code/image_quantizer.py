@@ -77,7 +77,7 @@ class ImageQuantizer:
     def __unquantize_block(self, block):
         for element in self.quantizer_array:
             location = element[1]
-            block[location] = element[0].centroid_map[block[location]]
+            block[location] = element[0].centroid_map[int(block[location])]
         return block
     
 
@@ -244,10 +244,10 @@ class ImageQuantizer:
         received_image = self.__path_to_matrix(received_image_path) 
         if sent_image.shape[0] != received_image.shape[0] or sent_image.shape[1] != received_image.shape[1]:
             raise Exception('Images have mismatched size')
-        distortion = 0
+        distortion = np.float32(0)
         for i in range(sent_image.shape[0]):
             for j in range(sent_image.shape[1]):
-                distortion = distortion + (sent_image[i][j] - received_image[i][j])**2
+                distortion = distortion + (float(sent_image[i][j]) - float(received_image[i][j]))**2
         return distortion/(sent_image.shape[0] * sent_image.shape[1])
 
 

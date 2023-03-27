@@ -183,7 +183,7 @@ class CoSQ:
         my_functions.iteration.restype = POINTER(c_float)
 
         #grab 10000 random training samples and loop mini batch gradient descent
-        for i in range(15 * int(len_training_set/5000)):
+        for i in range(5 * int(len_training_set/5000)):
             print('iteration ', i)
             if len(self.training_set)>5000:
                 subset = np.random.choice(self.training_set, 5000)

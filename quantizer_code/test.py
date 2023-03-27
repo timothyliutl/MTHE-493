@@ -25,6 +25,21 @@ bit_al_mat = np.matrix([[6,5,3,1,0,0,0,0],
                         [0,0,0,0,0,0,0,0],
                         ])
 
+bit_al_mat_76 = np.array([
+    [8,8,5,3,3,2,0,0],
+    [6,5,3,3,2,1,0,0],
+    [3,3,3,2,2,1,0,0],
+    [2,2,2,2,1,0,0,0],
+    [1,1,1,1,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+])
+
+img_quant = ImageQuantizer(bit_al_mat=bit_al_mat_76, epsilon=0.005)
+img_quant.import_training_set('../data/training_photos/')
+img_quant.train()
+img_quant.save_model('./model_76_new', '')
 
 
 
@@ -32,14 +47,14 @@ epsilon = 0.01
 obj2 = ImageQuantizer(bit_al_mat, epsilon)
 obj2.import_training_set('../data/org2/')
 image = cv2.imread('../data/org2/16.pgm')
-obj2.train()
-obj2.save_model('./model_01', ["#Epsilon = {}".format(epsilon)])
+#obj2.train()
+#obj2.save_model('./model_01', ["#Epsilon = {}".format(epsilon)])
 #obj2.load_model('./model_01')
 #obj2.quantizer_array[0][0].set_centroids([1,2])
 
 
-print(obj2.quantizer_array)
-compressed_img = obj2.compress_image(image)
+#print(obj2.quantizer_array)
+compressed_img = img_quant.compress_image(image)
 print(compressed_img)
 channel = Channel(0.01, bit_al_mat)
 received_img = channel.send_image(compressed_img)
