@@ -39,14 +39,12 @@ bit_al_mat_76 = np.array([
 img_quant = ImageQuantizer(bit_al_mat=bit_al_mat_76, epsilon=0.005)
 img_quant.import_training_set('../data/training_photos/')
 img_quant.train()
-img_quant.save_model('./model_76_new', '')
+img_quant.save_model('./model_76_hi_res', '')
 
 
 
-epsilon = 0.01
-obj2 = ImageQuantizer(bit_al_mat, epsilon)
-obj2.import_training_set('../data/org2/')
-image = cv2.imread('../data/org2/16.pgm')
+epsilon = 0.005
+image = cv2.imread('../data/hires_photos/mak-IqOCrPo2zf4-unsplash.jpg')
 #obj2.train()
 #obj2.save_model('./model_01', ["#Epsilon = {}".format(epsilon)])
 #obj2.load_model('./model_01')
@@ -58,6 +56,8 @@ compressed_img = img_quant.compress_image(image)
 print(compressed_img)
 channel = Channel(0.01, bit_al_mat)
 received_img = channel.send_image(compressed_img)
-uncompressed_img = obj2.reconstruct_image(received_img)
-plot = plt.imsave('uncompressed_image_01.png',uncompressed_img, cmap='gray')
+uncompressed_img = img_quant.reconstruct_image(received_img)
+plot = plt.imsave('city_76bit_e005.png',uncompressed_img, cmap='gray')
+
+#keinar photo 24 bits with PSNR of about 13.35
 
