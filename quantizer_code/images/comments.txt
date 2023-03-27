@@ -1,0 +1,7 @@
+76 bit weird tokyo image was trained using only one high res image that 
+did not have a lot of low light
+
+24 bit was trained using 200 images
+
+24_new_model trained using 200 smaller images
+24_hi_res model trained using 1 high res image
