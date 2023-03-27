@@ -120,10 +120,11 @@ class CoSQ:
                 #index/number the point is quantized to
 
                 #array that calculates all the mean square distances for each centroid
-                mse_array = []
+                mse_array = np.array([])
                 for input_index in range(len(centroids)):
                     #calculating expected distortion for a given quantization, input_index
-                    mse_array.append(calc_expected_distortion(centroids, input_index, point))
+                    mse_array = np.append(mse_array, calc_expected_distortion(centroids, input_index, point))
+                    #mse_array.append(calc_expected_distortion(centroids, input_index, point))
                 mse_array = np.array(mse_array)
                 #find quantization with smallest distortion and append quantization to corresponding centroid in partition output
                 index_smallest_distortion = np.argmin(mse_array)
@@ -160,7 +161,9 @@ class CoSQ:
 
     def quantize(self, value):
         mse_array = []
+        #mse_array = np.array([])
         for index, centroid in enumerate(self.centroids):
+            #mse_array = np.append(mse_array, self.__calc_expected_distortion(self.centroids, index, value))
             mse_array.append(self.__calc_expected_distortion(self.centroids, index, value))
         mse_array = np.array(mse_array)
         #return self.centroid_map[np.argmin(mse_array)]
