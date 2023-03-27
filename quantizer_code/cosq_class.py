@@ -202,4 +202,4 @@ class CoSQ:
             self.centroids = np.fromiter(return_iter, c_float, c_centroid_len)
             self.centroid_map = {index:centroid_val for index, centroid_val in enumerate(self.centroids)}
 
-        print(np.fromiter(return_iter, c_float, c_centroid_len))
+        print(self.centroids)

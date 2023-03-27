@@ -38,8 +38,8 @@ bit_al_mat_76 = np.array([
 
 img_quant = ImageQuantizer(bit_al_mat=bit_al_mat_76, epsilon=0.005)
 img_quant.import_training_set('../data/training_photos/')
-img_quant.train()
-img_quant.save_model('./model_76_hi_res', '')
+img_quant.load_model('./model_76_new')
+#img_quant.save_model('./model_76_hi_res', '')
 
 
 
