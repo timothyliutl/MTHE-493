@@ -3,6 +3,7 @@ from image_quantizer import ImageQuantizer
 from channel_class import Channel
 import numpy as np
 import cv2
+import math
 import matplotlib.pyplot as plt
 
 
@@ -36,28 +37,30 @@ bit_al_mat_76 = np.array([
     [0,0,0,0,0,0,0,0],
 ])
 
-img_quant = ImageQuantizer(bit_al_mat=bit_al_mat_76, epsilon=0.005)
-img_quant.import_training_set('../data/training_photos/')
-img_quant.load_model('./model_76_new')
-#img_quant.save_model('./model_76_hi_res', '')
+img_quant = ImageQuantizer(bit_al_mat=bit_al_mat_76, epsilon=0.01)
+#img_quant.import_training_set('../data/org/', random=True)
+#img_quant.train()
+#img_quant.save_model('./model_76_01_random', '')
 
 
-
-epsilon = 0.005
-image = cv2.imread('../data/hires_photos/mak-IqOCrPo2zf4-unsplash.jpg')
+#epsilon = 0.005
+image = cv2.imread('./original_fox.png')
 #obj2.train()
 #obj2.save_model('./model_01', ["#Epsilon = {}".format(epsilon)])
-#obj2.load_model('./model_01')
+img_quant.load_model('./model_76_01_random')
 #obj2.quantizer_array[0][0].set_centroids([1,2])
+img_quant.compute_encoder_mapping()
 
 
 #print(obj2.quantizer_array)
-compressed_img = img_quant.compress_image(image)
-print(compressed_img)
-channel = Channel(0.005, bit_al_mat)
-received_img = channel.send_image(compressed_img)
-uncompressed_img = img_quant.reconstruct_image(received_img)
-plot = plt.imsave('city_76bit_e005.png',uncompressed_img, cmap='gray')
+#compressed_img = img_quant.compress_image(image)
+##print(compressed_img)
+#channel = Channel(0.01, bit_al_mat_76)
+#received_img = channel.send_image(compressed_img)
+#uncompressed_img = img_quant.reconstruct_image(received_img)
+#plot = plt.imsave('received_fox_76bit_e01.png',uncompressed_img, cmap='gray')
+#psnr = 10 * math.log(255**2 / img_quant.calc_distortion("./original_fox.png", "received_fox_76bit_e01.png"), 10)
+#print(255**2 / img_quant.calc_distortion("./original_fox.png", "received_fox_76bit_e01.png"))
 
 #keinar photo 24 bits with PSNR of about 13.35
 

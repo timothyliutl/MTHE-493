@@ -1,6 +1,10 @@
 import numpy as np
 from ctypes import *
-my_functions = CDLL('cosq_funct.so')
+from sys import platform
+if platform == "linux" or platform == "linux2":
+    my_functions = CDLL('./cosq_funct.so')
+else:
+    my_functions = CDLL('cosq_funct.so')
 
 
 class CoSQ:
@@ -9,6 +13,7 @@ class CoSQ:
         self.bits = bits
         self.centroids = []
         self.centroid_map = {}
+        self.quantizer_map = np.zeros((1023+1024)*10)
 
     def training_set(self, training_input):
         self.training_set = training_input
@@ -169,6 +174,15 @@ class CoSQ:
         #return self.centroid_map[np.argmin(mse_array)]
         return np.argmin(mse_array)
         # quantize a given input value
+
+    def compute_quantizer_map(self):
+        for i, val in enumerate(np.arrange(-1024, 1023, 0.1)):
+            self.quantizer_map[i] = self.quantize(val)
+
+    def quantize_optimized(self, value):
+        #round to nearest tenth
+        rounded_val = round(value,1)
+
 
     # Set centroids from previously saved model
     def set_centroids(self, centroids):

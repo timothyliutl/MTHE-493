@@ -1,5 +1,6 @@
 # creating a class to take in an image training set and compress given images
 import numpy as np
+import random
 import os
 import math
 import cv2
@@ -53,6 +54,24 @@ class ImageQuantizer:
     def __idct_funct(self, block):
         return np.matrix(self.__dct_matrix().transpose()) * np.matrix(block) * np.matrix(self.__dct_matrix())
 
+    # randomly sample num_samples blocks from an image
+    def __sample_blocks(self, image, num_samples):
+        height_rounded = int(image.shape[0]/8)
+        width_rounded = int(image.shape[1]/8)
+        used_blocks = np.zeros(shape=(height_rounded, width_rounded))
+        blocks = []
+        x = 0
+        y = 0
+        for i in range(num_samples):
+            while True:
+                x = random.randint(0, height_rounded-1) 
+                y = random.randint(0, width_rounded-1)
+                # Check if already used
+                if used_blocks[x, y] == 0:
+                    used_blocks[x, y] = 1
+                    break
+            blocks.append(self.__dct_funct(image[x*8:(x+1)*8, y*8:(y+1)*8]))
+        return blocks
 
     def __blockify(self, image):
         len_rounded = int(image.shape[0]/8)
@@ -93,18 +112,22 @@ class ImageQuantizer:
 
     # functions used for compressing an image set
     
-    def import_training_set(self, image_path):
+    def import_training_set(self, image_path, random = False):
         self.training_set = []
         files = [f for f in os.listdir(image_path)]
         #files = files[:20]
         if '.DS_Store' in files:
             files.remove('.DS_Store')
-        count = 0
-        for image_name in files:
-            #print(count)
-            count = count + 1
-            blocks = self.__blockify(self.__import_image(image_name, image_path))
-            self.training_set = self.training_set + self.__generate_training(blocks)
+        if not random:
+            count = 0
+            for image_name in files:
+                #print(count)
+                count = count + 1
+                blocks = self.__blockify(self.__import_image(image_name, image_path))
+                self.training_set = self.training_set + self.__generate_training(blocks)
+        else:
+            for image_name in files:
+                self.training_set = self.training_set + self.__sample_blocks(self.__import_image(image_name, image_path), 100)
         print(len(self.training_set))
 
     def train(self):
@@ -197,7 +220,10 @@ class ImageQuantizer:
                     element[0].set_centroids(centroids) 
         self.trained = True
 
-            
+    def compute_encoder_mapping(self):
+        for element in self.qunatizer_array:
+            element[0].compute_quantizer_map()
+
     def compress_image(self, image):
         if not self.trained:
             raise Exception('uwu i made a fucky: shit aint trained')
@@ -214,7 +240,7 @@ class ImageQuantizer:
         for i in range(length):
             for j in range(width):
                 count = count + 1
-                print('compressing block ',count, ' out of ', length*width )
+                #print('compressing block ',count, ' out of ', length*width )
                 block = image_dct_blocks[i*8:(i+1)*8, j*8:(j+1)*8]
                 quantized_block = np.zeros(shape=(8,8))
                 for element in self.quantizer_array:
