@@ -17,6 +17,7 @@ class ImageQuantizer:
         self.std_mat = np.matrix(np.zeros(shape=(8,8)))
 
         self.quantizer_array = []
+        self.quantizer_precomp_arr = np.zeros(shape=(8,8,(2000+2000)*10), dtype=int)
 
         for i in range(self.bit_allocation_matrix.shape[0]):
             for j in range(self.bit_allocation_matrix.shape[1]):
@@ -220,9 +221,19 @@ class ImageQuantizer:
                     element[0].set_centroids(centroids) 
         self.trained = True
 
-    def compute_encoder_mapping(self):
-        for element in self.qunatizer_array:
-            element[0].compute_quantizer_map()
+    def compute_encoder_mapping(self, file_path):
+        # pre-compute partitions for faster compression
+        for element in self.quantizer_array:
+            print("Computing encoder map for quantizer: {}".format(element[1]))
+            self.quantizer_precomp_arr[element[1]] = element[0].compute_quantizer_map()
+        np.save(file_path, self.quantizer_precomp_arr)
+
+    def load_encoder_mapping(self, file_path):
+        self.quantizer_precomp_arr = np.load(file_path)
+        for element in self.quantizer_array:
+            element[0].quantizer_map = self.quantizer_precomp_arr[element[1]]
+        print("Precomputed encoder map loaded successfully!")
+
 
     def compress_image(self, image):
         if not self.trained:
@@ -237,6 +248,8 @@ class ImageQuantizer:
         quantized_output = np.zeros(shape=(length*8, width*8), dtype=int)
         count = 0
 
+        max_val = -5000
+        min_val = 0
         for i in range(length):
             for j in range(width):
                 count = count + 1
@@ -248,9 +261,11 @@ class ImageQuantizer:
                     centroid_locations = element[0].centroids
                     pixel_val = block[location]
                     quantized_val = element[0].quantize(pixel_val)
+                    #quantized_val = element[0].quantize_optimized(pixel_val)
                     quantized_block[location] = quantized_val
                 quantized_output[i*8: (i+1)*8, j*8: (j+1)*8] = quantized_block
         #return self.reconstruct_image(quantized_output)
+        print("max val: {}, min val = {}".format(max_val, min_val))
         return quantized_output
 
     # tim
@@ -275,9 +290,6 @@ class ImageQuantizer:
             for j in range(sent_image.shape[1]):
                 distortion = distortion + (float(sent_image[i][j]) - float(received_image[i][j]))**2
         return distortion/(sent_image.shape[0] * sent_image.shape[1])
-
-
-
 
     # mitch
     # method to calculate distortion between compressed and original image

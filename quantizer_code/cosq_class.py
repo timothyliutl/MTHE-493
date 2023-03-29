@@ -13,7 +13,7 @@ class CoSQ:
         self.bits = bits
         self.centroids = []
         self.centroid_map = {}
-        self.quantizer_map = np.zeros((1023+1024)*10)
+        self.quantizer_map = np.zeros(shape=(2000+2000)*10, dtype=int)
 
     def training_set(self, training_input):
         self.training_set = training_input
@@ -176,13 +176,17 @@ class CoSQ:
         # quantize a given input value
 
     def compute_quantizer_map(self):
-        for i, val in enumerate(np.arrange(-1024, 1023, 0.1)):
+        for i, val in enumerate(np.arange(-2000, 2000, 0.1)):
+            if i % 1000 == 0:
+                print("Precomputing index: {}, val: {}".format(i, val))
             self.quantizer_map[i] = self.quantize(val)
+        return self.quantizer_map
 
     def quantize_optimized(self, value):
         #round to nearest tenth
         rounded_val = round(value,1)
-
+        index = int(10*(rounded_val + 2000))
+        return self.quantizer_map[index]
 
     # Set centroids from previously saved model
     def set_centroids(self, centroids):
