@@ -6,3 +6,6 @@ ganttchart1.pdf
 thesis_julian.pdf
 quantizer_code/__pycache__
 quantizer_code/cosq_funct.so
+
+manim-animation/media
+manim-animation/__pycache__
