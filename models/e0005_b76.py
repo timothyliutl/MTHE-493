@@ -18,12 +18,12 @@ bit_al_mat = np.matrix([[8,8,5,3,3,2,0,0],
                         ])
 
 img_quant = ImageQuantizer(bit_al_mat=bit_al_mat, epsilon=epsilon)
-img_quant.import_training_set('../data/org2/')
-img_quant.train()
-img_quant.save_model('./model_files/e0005_b76', '')
+#img_quant.import_training_set('../data/org2/')
+#img_quant.train()
+#img_quant.save_model('./model_files/e0005_b76', '')
 
-#img_quant.load_model('./model_files/e0005_b76')
-img_quant.compute_encoder_mapping("./model_files/e0005_b76")
+img_quant.load_model('./model_files/e0005_b76')
+#img_quant.compute_encoder_mapping("./model_files/e0005_b76")
 img_quant.load_encoder_mapping("./model_files/e0005_b76.npy")
 
 image = cv2.imread('./original_fox.png')
