@@ -248,8 +248,6 @@ class ImageQuantizer:
         quantized_output = np.zeros(shape=(length*8, width*8), dtype=int)
         count = 0
 
-        max_val = -5000
-        min_val = 0
         for i in range(length):
             for j in range(width):
                 count = count + 1
@@ -260,12 +258,11 @@ class ImageQuantizer:
                     location = element[1]
                     centroid_locations = element[0].centroids
                     pixel_val = block[location]
-                    quantized_val = element[0].quantize(pixel_val)
-                    #quantized_val = element[0].quantize_optimized(pixel_val)
+                    #quantized_val = element[0].quantize(pixel_val)
+                    quantized_val = element[0].quantize_optimized(pixel_val)
                     quantized_block[location] = quantized_val
                 quantized_output[i*8: (i+1)*8, j*8: (j+1)*8] = quantized_block
         #return self.reconstruct_image(quantized_output)
-        print("max val: {}, min val = {}".format(max_val, min_val))
         return quantized_output
 
     # tim
