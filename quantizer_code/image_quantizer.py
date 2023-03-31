@@ -251,7 +251,7 @@ class ImageQuantizer:
         for i in range(length):
             for j in range(width):
                 count = count + 1
-                #print('compressing block ',count, ' out of ', length*width )
+                print('compressing block ',count, ' out of ', length*width )
                 block = image_dct_blocks[i*8:(i+1)*8, j*8:(j+1)*8]
                 quantized_block = np.zeros(shape=(8,8))
                 for element in self.quantizer_array:
@@ -260,6 +260,36 @@ class ImageQuantizer:
                     pixel_val = block[location]
                     #quantized_val = element[0].quantize(pixel_val)
                     quantized_val = element[0].quantize_optimized(pixel_val)
+                    quantized_block[location] = quantized_val
+                quantized_output[i*8: (i+1)*8, j*8: (j+1)*8] = quantized_block
+        #return self.reconstruct_image(quantized_output)
+        return quantized_output
+    
+    def compress_image_unoptimized(self, image):
+        if not self.trained:
+            raise Exception('uwu i made a fucky: shit aint trained')
+        
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image_dct_blocks = self.__blockify(image)
+        
+        return_block_array = []
+        length = int(image.shape[0]/8)
+        width = int(image.shape[1]/8)
+        quantized_output = np.zeros(shape=(length*8, width*8), dtype=int)
+        count = 0
+
+        for i in range(length):
+            for j in range(width):
+                count = count + 1
+                print('compressing block ',count, ' out of ', length*width )
+                block = image_dct_blocks[i*8:(i+1)*8, j*8:(j+1)*8]
+                quantized_block = np.zeros(shape=(8,8))
+                for element in self.quantizer_array:
+                    location = element[1]
+                    centroid_locations = element[0].centroids
+                    pixel_val = block[location]
+                    quantized_val = element[0].quantize(pixel_val)
+                    #quantized_val = element[0].quantize_optimized(pixel_val)
                     quantized_block[location] = quantized_val
                 quantized_output[i*8: (i+1)*8, j*8: (j+1)*8] = quantized_block
         #return self.reconstruct_image(quantized_output)

@@ -186,7 +186,10 @@ class CoSQ:
         #round to nearest tenth
         rounded_val = round(value,1)
         index = int(10*(rounded_val + 2000))
-        return self.quantizer_map[index]
+        try:
+            return self.quantizer_map[index]
+        except:
+            return self.quantize(value)
 
     # Set centroids from previously saved model
     def set_centroids(self, centroids):
