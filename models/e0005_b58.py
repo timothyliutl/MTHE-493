@@ -18,21 +18,21 @@ bit_al_mat = np.matrix([[8,7,4,3,2,1,0,0],
                         ])
 
 img_quant = ImageQuantizer(bit_al_mat=bit_al_mat, epsilon=epsilon)
-#img_quant.import_training_set('../data/org2/')
-#img_quant.train()
-#img_quant.save_model('./model_files/e0005_b58', '')
+img_quant.import_training_set('../data/org2/')
+img_quant.train()
+img_quant.save_model('./model_files/e0005_b58', '')
 
-img_quant.load_model('./model_files/e0005_b58')
-#img_quant.compute_encoder_mapping("./model_files/e0005_b58")
-img_quant.load_encoder_mapping("./model_files/e0005_b58.npy")
+#img_quant.load_model('./model_files/e0005_b58')
+img_quant.compute_encoder_mapping("./model_files/e0005_b58")
+#img_quant.load_encoder_mapping("./model_files/e0005_b58.npy")
 
-image = cv2.imread('./original_fox.png')
+image = cv2.imread('./original_deer.png')
 compressed_img = img_quant.compress_image(image)
 channel = Channel(epsilon, bit_al_mat)
 received_img = channel.send_image(compressed_img)
 uncompressed_img = img_quant.reconstruct_image(received_img)
-plt.imsave('./images/received_fox_58bit_e0005.png', uncompressed_img, cmap='gray')
+plt.imsave('./images/received_deer_58bit_e0005.png', uncompressed_img, cmap='gray')
 
-psnr = 10*math.log(255**2 / img_quant.calc_distortion('./images/received_fox_58bit_e0005.png', './original_fox.png'), 10)
+psnr = 10*math.log(255**2 / img_quant.calc_distortion('./images/received_deer_58bit_e0005.png', './original_deer.png'), 10)
 print("58 bit PSNR for epsilon {}:  {}".format(epsilon, psnr))
 

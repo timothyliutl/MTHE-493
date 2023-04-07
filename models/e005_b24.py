@@ -24,7 +24,7 @@ img_quant.save_model('./model_files/e005_b24', '')
 
 #img_quant.load_model('./model_files/e005_b24')
 img_quant.compute_encoder_mapping("./model_files/e005_b24")
-img_quant.load_encoder_mapping("./model_files/e005_b24.npy")
+#img_quant.load_encoder_mapping("./model_files/e005_b24.npy")
 
 image = cv2.imread('./original_fox.png')
 compressed_img = img_quant.compress_image(image)

@@ -28,7 +28,7 @@ class ImageQuantizer:
         
 
     def __import_image(self, file_path, image_file_path):
-        print(image_file_path + file_path)
+        #print(image_file_path + file_path)
         im = cv2.imread(image_file_path + file_path)
         return cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
     
@@ -129,7 +129,7 @@ class ImageQuantizer:
         else:
             for image_name in files:
                 self.training_set = self.training_set + self.__sample_blocks(self.__import_image(image_name, image_path), 100)
-        print(len(self.training_set))
+        #print(len(self.training_set))
 
     def train(self):
         self.trained = True
